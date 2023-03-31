@@ -14,7 +14,7 @@ const addPatientDetails = async (req, res) => {
         let parsePatientDetails = JSON.stringify(patientDetails)
 
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
-        let getPatientWallet = await wallet.get(patientDetailspatientId);
+        let getPatientWallet = await wallet.get(patientDetails.patientId);
         if (getPatientWallet) {
             res.send(`Patient ${patientDetails.patientId} already exists`)
         }
