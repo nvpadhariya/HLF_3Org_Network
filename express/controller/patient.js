@@ -13,19 +13,26 @@ const addPatientDetails = async (req, res) => {
         let patientDetails = req.body;
         let parsePatientDetails = JSON.stringify(patientDetails)
 
-        const buildCcpForOrg1 = buildCCPOrg1();
-        const caOrg1Client = buildCAClient(FabricCAServices, buildCcpForOrg1, 'ca.org1');
-        const walletOrg1 = await buildWallet(Wallets, walletPathOrg1);
-        await registerAndEnrollUser(caOrg1Client, walletOrg1, mspOrg1, patientDetails.patientId, 'org1.department1');;
-
-        let args = [parsePatientDetails];
-        let result = await Invoke("addPatientDetails", args, patientDetails.patientId, ccpOrg1, walletPathOrg1);
-
-        if (result) {
-            res.status(500).send({ result: result.responses[0].response.message })
+        const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
+        let getPatientWallet = await wallet.get(patientDetailspatientId);
+        if (getPatientWallet) {
+            res.send(`Patient ${patientDetails.patientId} already exists`)
         }
         else {
-            res.status(200).send(`Patient ${patientDetails.patientId} created successfully`);
+            const buildCcpForOrg1 = buildCCPOrg1();
+            const caOrg1Client = buildCAClient(FabricCAServices, buildCcpForOrg1, 'ca.org1');
+            const walletOrg1 = await buildWallet(Wallets, walletPathOrg1);
+            await registerAndEnrollUser(caOrg1Client, walletOrg1, mspOrg1, patientDetails.patientId, 'org1.department1');;
+
+            let args = [parsePatientDetails];
+            let result = await Invoke("addPatientDetails", args, patientDetails.patientId, ccpOrg1, walletPathOrg1);
+
+            if (result) {
+                res.status(500).send({ result: result.responses[0].response.message })
+            }
+            else {
+                res.status(200).send(`Patient ${patientDetails.patientId} created successfully`);
+            }
         }
     }
     catch (error) {

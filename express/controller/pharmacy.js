@@ -13,19 +13,26 @@ const addPharmacyDetails = async (req, res) => {
         let pharmacyDetails = req.body;
         let parsePharmacyDetails = JSON.stringify(pharmacyDetails);
 
-        const buildCcpForOrg3 = buildCCPOrg3();
-        const caOrg3Client = buildCAClient(FabricCAServices, buildCcpForOrg3, 'ca.org3');
-        const walletOrg3 = await buildWallet(Wallets, walletPathOrg3);
-        await registerAndEnrollUser(caOrg3Client, walletOrg3, mspOrg3, pharmacyDetails.pharmacyId, 'org3.department1');
-
-        let args = [parsePharmacyDetails];
-        let result = await Invoke("addPharmacyDetails", args, pharmacyDetails.pharmacyId, ccpOrg3, walletPathOrg3);
-
-        if (result) {
-            res.status(500).end({ result: result.responses[0].response.message })
+        const wallet = await Wallets.newFileSystemWallet(walletPathOrg3);
+        let getPharmacyWallet = await wallet.get(pharmacyDetails.pharmacyId);
+        if (getPharmacyWallet) {
+            res.send(`Pharmacy ${pharmacyDetails.pharmacyId} already exists`)
         }
         else {
-            res.status(200).send(`Pharmacy ${pharmacyDetails.pharmacyId} created successfully`);
+            const buildCcpForOrg3 = buildCCPOrg3();
+            const caOrg3Client = buildCAClient(FabricCAServices, buildCcpForOrg3, 'ca.org3');
+            const walletOrg3 = await buildWallet(Wallets, walletPathOrg3);
+            await registerAndEnrollUser(caOrg3Client, walletOrg3, mspOrg3, pharmacyDetails.pharmacyId, 'org3.department1');
+
+            let args = [parsePharmacyDetails];
+            let result = await Invoke("addPharmacyDetails", args, pharmacyDetails.pharmacyId, ccpOrg3, walletPathOrg3);
+
+            if (result) {
+                res.status(500).end({ result: result.responses[0].response.message })
+            }
+            else {
+                res.status(200).send(`Pharmacy ${pharmacyDetails.pharmacyId} created successfully`);
+            }
         }
     }
     catch (error) {

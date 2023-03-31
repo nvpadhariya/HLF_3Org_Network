@@ -13,18 +13,27 @@ const addHospitalDetails = async (req, res) => {
         let addHospitalDetails = req.body;
         let parseaddHospitalDetails = JSON.stringify(addHospitalDetails);
 
-        const buildCcpForOrg2 = buildCcpOrg2();
-        const caOrg2Client = buildCAClient(FabricCAServices, buildCcpForOrg2, 'ca.org2');
-        const walletOrg2 = await buildWallet(Wallets, walletPathOrg2);
-        await registerAndEnrollUser(caOrg2Client, walletOrg2, mspOrg2, addHospitalDetails.hospitalId, 'org2.department1');
+        const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
+        let getHospitalWallet = await wallet.get(addHospitalDetails.hospitalId);
+        console.log(getHospitalWallet);
 
-        let args = [parseaddHospitalDetails];
-        let result = await Invoke("addHospitalDetails", args, addHospitalDetails.hospitalId, ccpOrg2, walletPathOrg2);
+        if (getHospitalWallet) {
+            res.send(`Hospital ${addHospitalDetails.hospitalId} already exists!`)
+        }
+        else {
+            const buildCcpForOrg2 = buildCcpOrg2();
+            const caOrg2Client = buildCAClient(FabricCAServices, buildCcpForOrg2, 'ca.org2');
+            const walletOrg2 = await buildWallet(Wallets, walletPathOrg2);
+            await registerAndEnrollUser(caOrg2Client, walletOrg2, mspOrg2, addHospitalDetails.hospitalId, 'org2.department1');
 
-        if (result) {
-            res.status(500).send({ result: result.responses[0].response.message })
-        } else {
-            res.status(200).send({ message: `Hospital ${addHospitalDetails.hospitalId} created successfully` });
+            let args = [parseaddHospitalDetails];
+            let result = await Invoke("addHospitalDetails", args, addHospitalDetails.hospitalId, ccpOrg2, walletPathOrg2);
+
+            if (result) {
+                res.status(500).send({ result: result.responses[0].response.message })
+            } else {
+                res.status(200).send({ message: `Hospital ${addHospitalDetails.hospitalId} created successfully` });
+            }
         }
     }
     catch (error) {
