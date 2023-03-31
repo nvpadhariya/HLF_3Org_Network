@@ -1,25 +1,25 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 
-const { mspOrg1, ccpOrg1, walletPathOrg1 } = require('../config')
+const { mspOrg1, ccpOrg1, ccpOrg2, ccpOrg3, walletPathOrg1, walletPathOrg2, walletPathOrg3, channelName, chaincodeName } = require('../config')
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg1, buildWallet } = require('../AppUtil.js');
 
-const { InvokePatient } = require('../invoke');
-const { QueryPatient } = require('../query');
+const { Invoke } = require('../invoke');
+const { Query } = require('../query');
 
 const addPatientDetails = async (req, res) => {
     try {
         let patientDetails = req.body;
         let parsePatientDetails = JSON.stringify(patientDetails)
 
-        const ccpOrg1 = buildCCPOrg1();
-        const caOrg1Client = buildCAClient(FabricCAServices, ccpOrg1, 'ca.org1');
+        const buildCcpForOrg1 = buildCCPOrg1();
+        const caOrg1Client = buildCAClient(FabricCAServices, buildCcpForOrg1, 'ca.org1');
         const walletOrg1 = await buildWallet(Wallets, walletPathOrg1);
         await registerAndEnrollUser(caOrg1Client, walletOrg1, mspOrg1, patientDetails.patientId, 'org1.department1');;
 
         let args = [parsePatientDetails];
-        let result = await InvokePatient("addPatientDetails", args, patientDetails.patientId, res);
+        let result = await Invoke("addPatientDetails", args, patientDetails.patientId, ccpOrg1, walletPathOrg1);
 
         if (result) {
             res.send({ result: result.responses[0].response.message })
@@ -40,7 +40,7 @@ const getPatientDetails = async (req, res) => {
         let getPatientWallet = await wallet.get(req.params.patientId);
         if (getPatientWallet) {
             let args = [req.params.patientId];
-            let result = await QueryPatient("getPatientlByIdNew", args, req.params.patientId);
+            let result = await Query("getPatientlByIdNew", args, req.params.patientId, ccpOrg1, walletPathOrg1);
             res.send(JSON.parse(result));
         }
         else {
@@ -64,17 +64,25 @@ const createAppointment = async (req, res) => {
 
         let parseCreateAppointmentDetails = JSON.stringify(createAppointmentDetails);
 
-        let args = [parseCreateAppointmentDetails];
-        let result = await InvokePatient("createAppointment", args, createAppointmentDetails.patientId, res);
+        const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
+        let getPatientWallet = await wallet.get(createAppointmentDetails.patientId);
+        console.log(getPatientWallet);
+        if (getPatientWallet) {
+            let args = [parseCreateAppointmentDetails];
+            let result = await Invoke("createAppointment", args, createAppointmentDetails.patientId, ccpOrg1, walletPathOrg1);
 
-        if (result) {
-            res.status(200).send({ result: result.responses[0].response.message })
+            if (result) {
+                res.status(200).send({ result: result.responses[0].response.message, })
+            }
+            else {
+                let args = [createAppointmentDetails.appointmentId];
+                let getUpdatedAppointment = await Query("getAppointmentDetailsById", args, req.body.patientId, ccpOrg1, walletPathOrg1);
+                getUpdatedAppointment = JSON.parse(getUpdatedAppointment);
+                res.send(getUpdatedAppointment);
+            }
         }
         else {
-            let args = [createAppointmentDetails.appointmentId];
-            let getUpdatedAppointment = await QueryPatient("getAppointmentDetailsById", args, req.body.patientId);
-            getUpdatedAppointment = JSON.parse(getUpdatedAppointment);
-            res.send(getUpdatedAppointment);
+            res.send(`Patient ${createAppointmentDetails.patientId} does not exists`)
         }
     }
     catch (error) {

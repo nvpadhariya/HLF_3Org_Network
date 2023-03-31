@@ -58,7 +58,7 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affil
 	try {
 		// Check to see if we've already enrolled the user
 		const userIdentity = await wallet.get(userId);
-		console.log(userIdentity, "userIdentity from 61");
+		// console.log(userIdentity, "userIdentity from 61");
 		if (userIdentity) {
 			console.log(`An identity for the user ${userId} already exists in the wallet`);
 			// throw Error(`An identity for the user ${userId} already exists in the wallet`)

@@ -41,5 +41,5 @@ module.exports = {
     walletPathOrg2,
     ccpPathOrg3,
     ccpOrg3,
-    walletPathOrg3
+    walletPathOrg3,
 }
