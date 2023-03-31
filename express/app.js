@@ -9,24 +9,17 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
-const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../express/CAUtil.js');
-const { buildCCPOrg1, buildCCPOrg2, buildCCPOrg3, buildWallet } = require('../express/AppUtil.js');
-
-const channelName = 'health-channel';
-const chaincodeName = 'Hospital';
-const memberAssetCollectionName = 'assetPrivateCollection';
-const org1PrivateCollectionName = 'PatientOrgMSPPrivateCollection';
-const org2PrivateCollectionName = 'HospitalOrgMSPPrivateCollection';
-const org3PrivateCollectionName = 'PharmacyOrgMSPPrivateCollection';
-const mspOrg1 = 'PatientOrgMSP';
-const mspOrg2 = 'HospitalOrgMSP';
-const mspOrg3 = 'PharmacyOrgMSP';
-
-const walletPath = path.join(__dirname, 'wallet');
-
-const Org1UserId = 'appUser4';
-const Org2UserId = 'appUser5';
-const Org3UserId = 'appUser6';
+const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('./CAUtil.js');
+const { buildCCPOrg1, buildCcpOrg2, buildCCPOrg3, buildWallet } = require('./AppUtil.js');
+const { channelName, chaincodeName,
+	memberAssetCollectionName,
+	org1PrivateCollectionName,
+	org2PrivateCollectionName,
+	org3PrivateCollectionName,
+	mspOrg1,
+	mspOrg2,
+	mspOrg3,
+} = require('./config');
 
 async function initContractFromOrg1Identity() {
 	// console.log('\n--> Fabric client user & Gateway init: Using Org1 identity to Org1 Peer');
@@ -38,12 +31,10 @@ async function initContractFromOrg1Identity() {
 
 	await enrollAdmin(caOrg1Client, walletOrg1, mspOrg1);
 
-	await registerAndEnrollUser(caOrg1Client, walletOrg1, mspOrg1, Org1UserId, 'org1.department1');
-
 	try {
 		const gatewayOrg1 = new Gateway();
 		await gatewayOrg1.connect(ccpOrg1,
-			{ wallet: walletOrg1, identity: Org1UserId, discovery: { enabled: true, asLocalhost: true } });
+			{ wallet: walletOrg1, identity: 'admin', discovery: { enabled: true, asLocalhost: true } });
 
 		return gatewayOrg1;
 	} catch (error) {
@@ -53,20 +44,20 @@ async function initContractFromOrg1Identity() {
 
 async function initContractFromOrg2Identity() {
 	// console.log('\n--> Fabric client user & Gateway init: Using Org2 identity to Org2 Peer');
-	const ccpOrg2 = buildCCPOrg2();
+	const ccpOrg2 = buildCcpOrg2();
 	const caOrg2Client = buildCAClient(FabricCAServices, ccpOrg2, 'ca.org2');
 
 	const walletPathOrg2 = path.join(__dirname, 'wallet/org2');
 	const walletOrg2 = await buildWallet(Wallets, walletPathOrg2);
 
 	await enrollAdmin(caOrg2Client, walletOrg2, mspOrg2);
-	await registerAndEnrollUser(caOrg2Client, walletOrg2, mspOrg2, Org2UserId, 'org2.department1');
+	// await registerAndEnrollUser(caOrg2Client, walletOrg2, mspOrg2, Org2UserId, 'org2.department1');
 
 	try {
 		// Create a new gateway for connecting to Org's peer node.
 		const gatewayOrg2 = new Gateway();
 		await gatewayOrg2.connect(ccpOrg2,
-			{ wallet: walletOrg2, identity: Org2UserId, discovery: { enabled: true, asLocalhost: true } });
+			{ wallet: walletOrg2, identity: 'admin', discovery: { enabled: true, asLocalhost: true } });
 
 		return gatewayOrg2;
 	} catch (error) {
@@ -82,13 +73,13 @@ async function initContractFromOrg3Identity() {
 	const walletOrg3 = await buildWallet(Wallets, walletPathOrg3);
 
 	await enrollAdmin(caOrg3Client, walletOrg3, mspOrg3);
-	await registerAndEnrollUser(caOrg3Client, walletOrg3, mspOrg3, Org3UserId, 'org3.department1');
+	// await registerAndEnrollUser(caOrg3Client, walletOrg3, mspOrg3, Org3UserId, 'org3.department1');
 
 	try {
 		// Create a new gateway for connecting to Org's peer node.
 		const gatewayOrg3 = new Gateway();
 		await gatewayOrg3.connect(ccpOrg3,
-			{ wallet: walletOrg3, identity: Org3UserId, discovery: { enabled: true, asLocalhost: true } });
+			{ wallet: walletOrg3, identity: 'admin', discovery: { enabled: true, asLocalhost: true } });
 
 		return gatewayOrg3;
 	} catch (error) {
