@@ -5,6 +5,9 @@ const { mspOrg2, ccpOrg2, walletPathOrg2 } = require('../config');
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCcpOrg2, buildWallet } = require('../AppUtil.js');
 
+const { InvokeHospital } = require('../invoke');
+const { QueryHospital } = require('../query')
+
 const addHospitalDetails = async (req, res) => {
     try {
         let addHospitalDetails = req.body;
@@ -16,7 +19,7 @@ const addHospitalDetails = async (req, res) => {
         await registerAndEnrollUser(caOrg2Client, walletOrg2, mspOrg2, addHospitalDetails.hospitalId, 'org2.department1');
 
         let args = [parseaddHospitalDetails];
-        let result = await Invoke("addHospitalDetails", args, addHospitalDetails.hospitalId, res);
+        let result = await InvokeHospital("addHospitalDetails", args, addHospitalDetails.hospitalId, res);
 
         if (result) {
             res.status(200).send({ result: result.responses[0].response.message })
@@ -36,7 +39,7 @@ const getHospitalDetails = async (req, res) => {
         let getHospitalWallet = await wallet.get(req.params.hospitalId);
         if (getHospitalWallet) {
             let args = [req.params.hospitalId];
-            let result = await Query("getHospitalDetailsById", args, req.params.hospitalId);
+            let result = await QueryHospital("getHospitalDetailsById", args, req.params.hospitalId);
             res.send(JSON.parse(result))
         }
         else {
@@ -57,13 +60,13 @@ const updateAppointment = async (req, res) => {
         let stringifyData = JSON.stringify(appointmentData);
 
         let args = [stringifyData];
-        let result = await Invoke("updateAppointment", args, appointmentData.details.hospitalID, res);
+        let result = await InvokeHospital("updateAppointment", args, appointmentData.details.hospitalID, res);
         if (!result) {
             res.status(200).send({ result: result.responses[0].response })
         }
         else {
             let args = [appointmentData.appointmentId];
-            let getAppointment = await Query("getAppointmentDetailsById", args, appointmentData.details.hospitalID);
+            let getAppointment = await QueryHospital("getAppointmentDetailsById", args, appointmentData.details.hospitalID);
             getAppointment = JSON.parse(getAppointment);
             res.send({
                 message: `Appointment ${appointmentData.appointmentId} updated successfully`,
@@ -76,42 +79,4 @@ const updateAppointment = async (req, res) => {
     }
 }
 
-const Invoke = async (funcName, args, hospitalId, req, res) => {
-    try {
-        const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
-        const gateway = new Gateway();
-        await gateway.connect(ccpOrg2, { wallet, identity: hospitalId, discovery: { enabled: true, asLocalhost: true } });
-        const network = await gateway.getNetwork('health-channel');
-        const contract = network.getContract('Hospital');
-
-        if (args.length == 1) {
-            let result = await contract.submitTransaction(funcName, args[0]);
-            return result.toString();
-        }
-    }
-    catch (error) {
-        console.log(error);
-        return (error)
-    }
-}
-
-const Query = async (funcName, args, hospitalId, req, res) => {
-    try {
-        const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
-        const gateway = new Gateway();
-        await gateway.connect(ccpOrg2, { wallet, identity: hospitalId, discovery: { enabled: true, asLocalhost: true } });
-        const network = await gateway.getNetwork('health-channel');
-        const contract = network.getContract('Hospital');
-
-        if (args.length == 1) {
-            let result = await contract.evaluateTransaction(funcName, args[0]);
-            return result
-        }
-    }
-    catch (error) {
-        console.log(error);
-        return (error)
-    }
-}
-
-module.exports = { addHospitalDetails, getHospitalDetails, updateAppointment, Invoke, Query }
+module.exports = { addHospitalDetails, getHospitalDetails, updateAppointment }
