@@ -1,7 +1,7 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 
-const { mspOrg2, ccpOrg1, ccpOrg2, ccpOrg3, walletPathOrg1, walletPathOrg2, walletPathOrg3, channelName, chaincodeName } = require('../config');
+const { mspOrg2, ccpOrg2, walletPathOrg2 } = require('../config');
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCcpOrg2, buildWallet } = require('../AppUtil.js');
 
