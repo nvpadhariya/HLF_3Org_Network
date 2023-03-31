@@ -22,14 +22,14 @@ const addHospitalDetails = async (req, res) => {
         let result = await Invoke("addHospitalDetails", args, addHospitalDetails.hospitalId, ccpOrg2, walletPathOrg2);
 
         if (result) {
-            res.status(200).send({ result: result.responses[0].response.message })
+            res.status(500).send({ result: result.responses[0].response.message })
         } else {
-            res.send(`Hospital ${addHospitalDetails.hospitalId} created successfully`);
+            res.status(200).send({ message: `Hospital ${addHospitalDetails.hospitalId} created successfully` });
         }
     }
     catch (error) {
         console.log(error);
-        res.send(`${error.message}`);
+        res.status(500).send(`${error.message}`);
     }
 }
 
@@ -41,10 +41,10 @@ const getHospitalDetails = async (req, res) => {
         if (getHospitalWallet) {
             let args = [req.params.hospitalId];
             let result = await Query("getHospitalDetailsById", args, req.params.hospitalId, ccpOrg2, walletPathOrg2);
-            res.send(JSON.parse(result))
+            res.status(200).send(JSON.parse(result))
         }
         else {
-            res.send(`Hospital ${req.params.hospitalId} is not available`)
+            res.status(500).send(`Hospital ${req.params.hospitalId} is not available`)
         }
     }
     catch (error) {
@@ -67,17 +67,17 @@ const updateAppointment = async (req, res) => {
         if (getHospitalWallet) {
             let result = await Invoke("updateAppointment", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
             if (!result) {
-                res.status(200).send({ result: result.responses[0].response })
+                res.status(500).send({ result: result.responses[0].response })
             }
             else {
                 let args = [appointmentData.appointmentId];
                 let getAppointment = await Query("getAppointmentDetailsById", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
                 getAppointment = JSON.parse(getAppointment);
-                res.send(getAppointment);
+                res.status(200).send(getAppointment);
             }
         }
         else {
-            res.send(`Hospital ${appointmentData.details.hospitalId} does not exists`)
+            res.status(500).send(`Hospital ${appointmentData.details.hospitalId} does not exists`)
         }
 
     }

@@ -22,10 +22,10 @@ const addPatientDetails = async (req, res) => {
         let result = await Invoke("addPatientDetails", args, patientDetails.patientId, ccpOrg1, walletPathOrg1);
 
         if (result) {
-            res.send({ result: result.responses[0].response.message })
+            res.status(500).send({ result: result.responses[0].response.message })
         }
         else {
-            res.send(`Patient ${patientDetails.patientId} created successfully`);
+            res.status(200).send(`Patient ${patientDetails.patientId} created successfully`);
         }
     }
     catch (error) {
@@ -41,10 +41,10 @@ const getPatientDetails = async (req, res) => {
         if (getPatientWallet) {
             let args = [req.params.patientId];
             let result = await Query("getPatientlByIdNew", args, req.params.patientId, ccpOrg1, walletPathOrg1);
-            res.send(JSON.parse(result));
+            res.status(200).send(JSON.parse(result));
         }
         else {
-            res.send(`Patient ${req.params.patientId} is not available`);
+            res.status(500).send(`Patient ${req.params.patientId} is not available`);
         }
     }
     catch (error) {
@@ -72,17 +72,17 @@ const createAppointment = async (req, res) => {
             let result = await Invoke("createAppointment", args, createAppointmentDetails.patientId, ccpOrg1, walletPathOrg1);
 
             if (result) {
-                res.status(200).send({ result: result.responses[0].response.message, })
+                res.status(500).send({ result: result.responses[0].response.message, })
             }
             else {
                 let args = [createAppointmentDetails.appointmentId];
                 let getUpdatedAppointment = await Query("getAppointmentDetailsById", args, req.body.patientId, ccpOrg1, walletPathOrg1);
                 getUpdatedAppointment = JSON.parse(getUpdatedAppointment);
-                res.send(getUpdatedAppointment);
+                res.status(200).send(getUpdatedAppointment);
             }
         }
         else {
-            res.send(`Patient ${createAppointmentDetails.patientId} does not exists`)
+            res.status(500).send(`Patient ${createAppointmentDetails.patientId} does not exists`)
         }
     }
     catch (error) {

@@ -22,15 +22,15 @@ const addPharmacyDetails = async (req, res) => {
         let result = await Invoke("addPharmacyDetails", args, pharmacyDetails.pharmacyId, ccpOrg3, walletPathOrg3);
 
         if (result) {
-            res.send({ result: result.responses[0].response.message })
+            res.status(500).end({ result: result.responses[0].response.message })
         }
         else {
-            res.send(`Pharmacy ${pharmacyDetails.pharmacyId} created successfully`);
+            res.status(200).send(`Pharmacy ${pharmacyDetails.pharmacyId} created successfully`);
         }
     }
     catch (error) {
         console.log(error);
-        res.status(500).send(error.message);
+        res.status(500).status(500).send(error.message);
     }
 }
 
@@ -41,10 +41,10 @@ const getPharmacyDetails = async (req, res) => {
         if (getPharmacyWallet) {
             let args = [req.params.pharmacyId];
             let result = await Query("getPharmacyDetailsById", args, req.params.pharmacyId, ccpOrg3, walletPathOrg3);
-            res.send(JSON.parse(result));
+            res.status(200).send(JSON.parse(result));
         }
         else {
-            res.send(`Pharmacy ${req.params.pharmacyId} is not available`)
+            res.status(500).send(`Pharmacy ${req.params.pharmacyId} is not available`)
         }
     }
     catch (error) {
