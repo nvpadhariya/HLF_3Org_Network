@@ -1,10 +1,9 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
-
+const { StatusCodes } = require('http-status-codes');
 const { mspOrg1, ccpOrg1, walletPathOrg1 } = require('../config')
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg1, buildWallet } = require('../AppUtil.js');
-
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
 
@@ -16,7 +15,7 @@ const addPatientDetails = async (req, res) => {
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
         let getPatientWallet = await wallet.get(patientDetails.patientId);
         if (getPatientWallet) {
-            res.send(`Patient ${patientDetails.patientId} already exists`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Patient ${patientDetails.patientId} already exists` })
         }
         else {
             const buildCcpForOrg1 = buildCCPOrg1();
@@ -28,16 +27,15 @@ const addPatientDetails = async (req, res) => {
             let result = await Invoke("addPatientDetails", args, patientDetails.patientId, ccpOrg1, walletPathOrg1);
 
             if (result) {
-                res.status(500).send({ result: result.responses[0].response.message })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ result: result.responses[0].response.message })
             }
             else {
-                res.status(200).send(`Patient ${patientDetails.patientId} created successfully`);
+                res.status(StatusCodes.OK).send({ message: `Patient ${patientDetails.patientId} created successfully` });
             }
         }
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send(error.message);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 
@@ -48,15 +46,14 @@ const getPatientDetails = async (req, res) => {
         if (getPatientWallet) {
             let args = [req.params.patientId];
             let result = await Query("getPatientlByIdNew", args, req.params.patientId, ccpOrg1, walletPathOrg1);
-            res.status(200).send(JSON.parse(result));
+            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` });
         }
         else {
-            res.status(500).send(`Patient ${req.params.patientId} is not available`);
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Patient ${req.params.patientId} is not available` });
         }
     }
     catch (error) {
-        console.log(`Failed to get patient: ${error}`);
-        res.status(500).send(`${error} from catch`);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 
@@ -73,28 +70,26 @@ const createAppointment = async (req, res) => {
 
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
         let getPatientWallet = await wallet.get(createAppointmentDetails.patientId);
-        console.log(getPatientWallet);
         if (getPatientWallet) {
             let args = [parseCreateAppointmentDetails];
             let result = await Invoke("createAppointment", args, createAppointmentDetails.patientId, ccpOrg1, walletPathOrg1);
 
             if (result) {
-                res.status(500).send({ result: result.responses[0].response.message, })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ result: result.responses[0].response.message, })
             }
             else {
                 let args = [createAppointmentDetails.appointmentId];
                 let getUpdatedAppointment = await Query("getAppointmentDetailsById", args, req.body.patientId, ccpOrg1, walletPathOrg1);
                 getUpdatedAppointment = JSON.parse(getUpdatedAppointment);
-                res.status(200).send(getUpdatedAppointment);
+                res.status(StatusCodes.OK).send({ Appointment: getUpdatedAppointment });
             }
         }
         else {
-            res.status(500).send(`Patient ${createAppointmentDetails.patientId} does not exists`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Patient ${createAppointmentDetails.patientId} does not exists` })
         }
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send(error.message);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 

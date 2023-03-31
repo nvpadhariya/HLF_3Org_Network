@@ -1,10 +1,9 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
-
+const { StatusCodes } = require('http-status-codes');
 const { mspOrg3, ccpOrg3, walletPathOrg3 } = require('../config')
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg3, buildWallet } = require('../AppUtil.js');
-
 const { Invoke } = require('../invoke');
 const { Query } = require('../query')
 
@@ -16,7 +15,7 @@ const addPharmacyDetails = async (req, res) => {
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg3);
         let getPharmacyWallet = await wallet.get(pharmacyDetails.pharmacyId);
         if (getPharmacyWallet) {
-            res.send(`Pharmacy ${pharmacyDetails.pharmacyId} already exists`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Pharmacy ${pharmacyDetails.pharmacyId} already exists` })
         }
         else {
             const buildCcpForOrg3 = buildCCPOrg3();
@@ -28,16 +27,15 @@ const addPharmacyDetails = async (req, res) => {
             let result = await Invoke("addPharmacyDetails", args, pharmacyDetails.pharmacyId, ccpOrg3, walletPathOrg3);
 
             if (result) {
-                res.status(500).end({ result: result.responses[0].response.message })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).end({ result: result.responses[0].response.message })
             }
             else {
-                res.status(200).send(`Pharmacy ${pharmacyDetails.pharmacyId} created successfully`);
+                res.status(StatusCodes.OK).send({ message: `Pharmacy ${pharmacyDetails.pharmacyId} created successfully` });
             }
         }
     }
     catch (error) {
-        console.log(error);
-        res.status(500).status(500).send(error.message);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 
@@ -48,15 +46,14 @@ const getPharmacyDetails = async (req, res) => {
         if (getPharmacyWallet) {
             let args = [req.params.pharmacyId];
             let result = await Query("getPharmacyDetailsById", args, req.params.pharmacyId, ccpOrg3, walletPathOrg3);
-            res.status(200).send(JSON.parse(result));
+            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` });
         }
         else {
-            res.status(500).send(`Pharmacy ${req.params.pharmacyId} is not available`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Pharmacy ${req.params.pharmacyId} is not available` })
         }
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send(error.message);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 

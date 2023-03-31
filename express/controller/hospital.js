@@ -1,10 +1,9 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
-
+const { StatusCodes } = require('http-status-codes');
 const { mspOrg2, ccpOrg2, walletPathOrg2 } = require('../config');
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCcpOrg2, buildWallet } = require('../AppUtil.js');
-
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
 
@@ -15,10 +14,9 @@ const addHospitalDetails = async (req, res) => {
 
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
         let getHospitalWallet = await wallet.get(addHospitalDetails.hospitalId);
-        console.log(getHospitalWallet);
 
         if (getHospitalWallet) {
-            res.send(`Hospital ${addHospitalDetails.hospitalId} already exists!`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${addHospitalDetails.hospitalId} already exists` })
         }
         else {
             const buildCcpForOrg2 = buildCcpOrg2();
@@ -30,15 +28,14 @@ const addHospitalDetails = async (req, res) => {
             let result = await Invoke("addHospitalDetails", args, addHospitalDetails.hospitalId, ccpOrg2, walletPathOrg2);
 
             if (result) {
-                res.status(500).send({ result: result.responses[0].response.message })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: result.responses[0].response.message })
             } else {
-                res.status(200).send({ message: `Hospital ${addHospitalDetails.hospitalId} created successfully` });
+                res.status(StatusCodes.OK).send({ message: `Hospital ${addHospitalDetails.hospitalId} created successfully` });
             }
         }
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send(`${error.message}`);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 
@@ -46,18 +43,18 @@ const getHospitalDetails = async (req, res) => {
     try {
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
         let getHospitalWallet = await wallet.get(req.params.hospitalId);
-        console.log(getHospitalWallet, "getHospitalWallet");
+
         if (getHospitalWallet) {
             let args = [req.params.hospitalId];
             let result = await Query("getHospitalDetailsById", args, req.params.hospitalId, ccpOrg2, walletPathOrg2);
-            res.status(200).send(JSON.parse(result))
+            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` })
         }
         else {
-            res.status(500).send(`Hospital ${req.params.hospitalId} is not available`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${req.params.hospitalId} is not available` })
         }
     }
     catch (error) {
-        res.status(500).send(`${error}`);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
 
@@ -76,22 +73,22 @@ const updateAppointment = async (req, res) => {
         if (getHospitalWallet) {
             let result = await Invoke("updateAppointment", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
             if (!result) {
-                res.status(500).send({ result: result.responses[0].response })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ result: result.responses[0].response })
             }
             else {
                 let args = [appointmentData.appointmentId];
                 let getAppointment = await Query("getAppointmentDetailsById", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
                 getAppointment = JSON.parse(getAppointment);
-                res.status(200).send(getAppointment);
+                res.status(StatusCodes.OK).send({ Apponintment: getAppointment });
             }
         }
         else {
-            res.status(500).send(`Hospital ${appointmentData.details.hospitalId} does not exists`)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalId} does not exists` })
         }
 
     }
     catch (error) {
-        res.status(500).send(error.message)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message })
     }
 }
 
