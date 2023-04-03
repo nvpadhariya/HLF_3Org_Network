@@ -6,12 +6,13 @@ const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg1, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
+const { validatePatient, validateAppointment } = require('../validation')
 
 const addPatientDetails = async (req, res) => {
     try {
         let patientDetails = req.body;
         let parsePatientDetails = JSON.stringify(patientDetails)
-
+        await validatePatient(patientDetails);
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
         let getPatientWallet = await wallet.get(patientDetails.patientId);
         if (getPatientWallet) {
@@ -67,7 +68,7 @@ const createAppointment = async (req, res) => {
         createAppointmentDetails.updateDate = createAppointmentDetails.createDate
 
         let parseCreateAppointmentDetails = JSON.stringify(createAppointmentDetails);
-
+        await validateAppointment(createAppointmentDetails);
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg1);
         let getPatientWallet = await wallet.get(createAppointmentDetails.patientId);
         if (getPatientWallet) {

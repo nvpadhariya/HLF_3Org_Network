@@ -23,6 +23,27 @@ const ccpPathOrg3 = path.resolve(__dirname, '..', '..', 'test-network-3org-new',
 const ccpOrg3 = JSON.parse(fs.readFileSync(ccpPathOrg3, 'utf8'));
 const walletPathOrg3 = path.join(process.cwd(), 'wallet/org3');
 
+const OrgType = {
+    Patient: 'Patient',
+    Hospital: 'Hospital',
+    Pharmacy: 'Pharmacy',
+}
+
+const hospitalType = {
+    Government: "Government",
+    Private: "Private"
+}
+
+const docType = {
+    dentist: "dentist",
+    cardiologist: "cardiologist"
+}
+
+const patientType = {
+    patienId: "patienId"
+}
+const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+
 module.exports = {
     channelName,
     chaincodeName,
@@ -42,4 +63,9 @@ module.exports = {
     ccpPathOrg3,
     ccpOrg3,
     walletPathOrg3,
+    OrgType,
+    hospitalType,
+    docType,
+    patientType,
+    phoneRegExp
 }
