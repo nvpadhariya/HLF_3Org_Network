@@ -5,13 +5,14 @@ const { mspOrg3, ccpOrg3, walletPathOrg3 } = require('../config')
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg3, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
-const { Query } = require('../query')
+const { Query } = require('../query');
+const { validatePharmacy } = require('../validation');
 
 const addPharmacyDetails = async (req, res) => {
     try {
         let pharmacyDetails = req.body;
         let parsePharmacyDetails = JSON.stringify(pharmacyDetails);
-
+        await validatePharmacy(pharmacyDetails);
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg3);
         let getPharmacyWallet = await wallet.get(pharmacyDetails.pharmacyId);
         if (getPharmacyWallet) {

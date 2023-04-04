@@ -6,12 +6,13 @@ const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCcpOrg2, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
+const { validateHospital, validateUpdateAppointment } = require('../validation');
 
 const addHospitalDetails = async (req, res) => {
     try {
         let addHospitalDetails = req.body;
         let parseaddHospitalDetails = JSON.stringify(addHospitalDetails);
-
+        await validateHospital(addHospitalDetails);
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
         let getHospitalWallet = await wallet.get(addHospitalDetails.hospitalId);
 
@@ -35,6 +36,7 @@ const addHospitalDetails = async (req, res) => {
         }
     }
     catch (error) {
+        console.log(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
     }
 }
@@ -62,10 +64,9 @@ const updateAppointment = async (req, res) => {
     try {
         let appointmentData = req.body;
         appointmentData.updateDate = new Date();
-
-        appointmentData.removeFields = ["status", "appointmentId", "removeFields"]
+        appointmentData.removeFields = ["status", "appointmentId", "removeFields"];
+        await validateUpdateAppointment(appointmentData);
         let stringifyData = JSON.stringify(appointmentData);
-
         let args = [stringifyData];
 
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
