@@ -1,0 +1,48 @@
+{
+	"name": "test-network-3org-new",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": false,
+		"adminCredential": {
+			"id": "exploreradmin",
+			"password": "exploreradminpw"
+		},
+		"enableAuthentication": false,
+		"organization": "Org1MSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"health-channel": {
+			"peers": {
+				"peer0.patientorg": {}
+			}
+		}
+	},
+	"organizations": {
+		"Org1MSP": {
+			"mspid": "PatientOrgMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/patientorg/users/Admin@patientorg/msp/keystore/1f9b5bf21ea29c4c7f3a23ee20074500b045ad20dc69aab6c002e93a761874e0_sk"
+			},
+			"peers": ["peer0.patientorg"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/patientorg/users/Admin@patientorg/msp/signcerts/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.patientorg": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/patientorg/peers/peer0.patientorg/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.patientorg:7051"
+		}
+	}
+}
