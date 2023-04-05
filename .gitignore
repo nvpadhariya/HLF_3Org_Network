@@ -12,4 +12,5 @@ organizations/ordererOrganizations/*
 organizations/peerOrganizations/*
 system-genesis-block/*
 *.tar.gz
+explorer/organizations
 log.txt
