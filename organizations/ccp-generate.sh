@@ -39,7 +39,7 @@ function yaml_ccp {
 ORG=1
 P0PORT=7051
 CAPORT=7054
-NAME=patientorg
+NAME=PatientOrgMSP
 PEERPEM=organizations/peerOrganizations/patientorg/tlsca/tlsca.patientorg-cert.pem
 CAPEM=organizations/peerOrganizations/patientorg/ca/ca.patientorg-cert.pem
 
@@ -49,7 +49,7 @@ echo "$(yaml_ccp $ORG $P0PORT $CAPORT $NAME $PEERPEM $CAPEM)" > organizations/pe
 ORG=2
 P0PORT=9051
 CAPORT=8054
-NAME=hospitalorg
+NAME=HospitalOrgMSP
 PEERPEM=organizations/peerOrganizations/hospitalorg/tlsca/tlsca.hospitalorg-cert.pem
 CAPEM=organizations/peerOrganizations/hospitalorg/ca/ca.hospitalorg-cert.pem
 
@@ -59,7 +59,7 @@ echo "$(yaml_ccp $ORG $P0PORT $CAPORT $NAME $PEERPEM $CAPEM)" > organizations/pe
 ORG=3
 P0PORT=8051
 CAPORT=6054
-NAME=pharmacyorg
+NAME=PharmacyOrgMSP
 PEERPEM=organizations/peerOrganizations/pharmacyorg/tlsca/tlsca.pharmacyorg-cert.pem
 CAPEM=organizations/peerOrganizations/pharmacyorg/ca/ca.pharmacyorg-cert.pem
 

@@ -13,7 +13,7 @@
     },
     "organizations": {
         "Org${ORG}": {
-            "mspid": "Org${ORG}MSP",
+            "mspid": "${NAME}",
             "peers": [
                 "peer0.${NAME}"
             ],
