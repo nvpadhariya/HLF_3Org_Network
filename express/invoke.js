@@ -1,6 +1,7 @@
 const { Gateway, Wallets } = require('fabric-network');
 
 const { ccpOrg1, ccpOrg2, ccpOrg3, walletPathOrg1, walletPathOrg2, walletPathOrg3, channelName, chaincodeName } = require('./config');
+const { logger } = require('./logger');
 
 const Invoke = async (funcName, args, walletId, ccpOrg, walletPath) => {
     try {
@@ -16,8 +17,8 @@ const Invoke = async (funcName, args, walletId, ccpOrg, walletPath) => {
         }
     }
     catch (error) {
-        console.log(error);
-        return (error)
+        logger.error(`Error occured ${error}`);
+        return (error);
     }
 }
 

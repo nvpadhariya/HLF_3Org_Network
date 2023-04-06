@@ -2,7 +2,7 @@
 	"name": "test-network-3org-new",
 	"version": "1.0.0",
 	"client": {
-		"tlsEnable": false,
+		"tlsEnable": true,
 		"adminCredential": {
 			"id": "exploreradmin",
 			"password": "exploreradminpw"
@@ -42,7 +42,7 @@
 			"tlsCACerts": {
 				"path": "/tmp/crypto/peerOrganizations/patientorg/peers/peer0.patientorg/tls/ca.crt"
 			},
-			"url": "grpcs://peer0.patientorg:7051"
+			"url": "grpc://peer0.patientorg:7051"
 		}
 	}
 }
