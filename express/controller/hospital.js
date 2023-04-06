@@ -7,6 +7,8 @@ const { buildCcpOrg2, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
 const { validateHospital, validateUpdateAppointment } = require('../validation');
+const { logger } = require('../logger');
+const { Logform } = require('winston');
 
 const addHospitalDetails = async (req, res) => {
     try {
@@ -17,7 +19,8 @@ const addHospitalDetails = async (req, res) => {
         let getHospitalWallet = await wallet.get(addHospitalDetails.hospitalId);
 
         if (getHospitalWallet) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${addHospitalDetails.hospitalId} already exists` })
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${addHospitalDetails.hospitalId} already exists` });
+            logger.error(`Hospital ${addHospitalDetails.hospitalId} already exists`);
         }
         else {
             const buildCcpForOrg2 = buildCcpOrg2();
@@ -29,15 +32,17 @@ const addHospitalDetails = async (req, res) => {
             let result = await Invoke("addHospitalDetails", args, addHospitalDetails.hospitalId, ccpOrg2, walletPathOrg2);
 
             if (result) {
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: result.responses[0].response.message })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: result.responses[0].response.message });
+                logger.error(`Error adding hospital details: ${result.responses[0].response.message}`);
             } else {
                 res.status(StatusCodes.OK).send({ message: `Hospital ${addHospitalDetails.hospitalId} created successfully` });
+                logger.info(`Hospital ${addHospitalDetails.hospitalId} created successfully`)
             }
         }
     }
     catch (error) {
-        console.log(error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
+        logger.error(`Error occured while adding hospital ${error.message}`);
     }
 }
 
@@ -49,14 +54,17 @@ const getHospitalDetails = async (req, res) => {
         if (getHospitalWallet) {
             let args = [req.params.hospitalId];
             let result = await Query("getHospitalDetailsById", args, req.params.hospitalId, ccpOrg2, walletPathOrg2);
-            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` })
+            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` });
+            logger.info(`Successfully fetched hospital ${req.params.hospitalId} details`)
         }
         else {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${req.params.hospitalId} is not available` })
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${req.params.hospitalId} is not available` });
+            logger.error(`Hospital details ${req.params.hospitalId} is not available`);
         }
     }
     catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
+        logger.error(`Error occured while fetching hospital ${error.message}`);
     }
 }
 
@@ -74,22 +82,26 @@ const updateAppointment = async (req, res) => {
         if (getHospitalWallet) {
             let result = await Invoke("updateAppointment", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
             if (!result) {
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ result: result.responses[0].response })
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ result: result.responses[0].response });
+                logger.error(`Appointment ${appointmentData.appointmentId} is not available`);
             }
             else {
                 let args = [appointmentData.appointmentId];
                 let getAppointment = await Query("getAppointmentDetailsById", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
                 getAppointment = JSON.parse(getAppointment);
                 res.status(StatusCodes.OK).send({ Apponintment: getAppointment });
+                logger.info(`Successfully updated ${appointmentData.appointmentId} Appointment`);
             }
         }
         else {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalId} does not exists` })
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalId} does not exists` });
+            logger.error(`Hospital ${appointmentData.details.hospitalID} is not available`);
         }
 
     }
     catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message })
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: error.message });
+        logger.error(`Error occured ${error.message}`);
     }
 }
 

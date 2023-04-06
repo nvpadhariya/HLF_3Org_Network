@@ -8,21 +8,20 @@
 
 const fs = require('fs');
 const path = require('path');
+const { logger } = require('./logger');
 
 exports.buildCCPOrg1 = () => {
 	// load the common connection configuration file
 	const ccpPath = path.resolve(__dirname, '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'patientorg', 'connection-org1.json');
-	// console.log(ccpPath, "ccpPath from appUtils.js");
 	const fileExists = fs.existsSync(ccpPath);
 	if (!fileExists) {
 		throw new Error(`no such file or directory: ${ccpPath}`);
 	}
 	const contents = fs.readFileSync(ccpPath, 'utf8');
-	// console.log(contents, "contents from appUtils.js");
+
 	// build a JSON object from the file contents
 	const ccp = JSON.parse(contents);
-	// console.log(ccp, "ccp from appUtils.js");
-	// console.log(`Loaded the network configuration located at ${ccpPath}`);
+	logger.info(`Loaded the network configuration located at ${ccpPath}`);
 	return ccp;
 };
 
@@ -34,9 +33,10 @@ exports.buildCcpOrg2 = () => {
 		throw new Error(`no such file or directory: ${ccpPath}`);
 	}
 	const contents = fs.readFileSync(ccpPath, 'utf8');
+
 	// build a JSON object from the file contents
 	const ccp = JSON.parse(contents);
-	// console.log(`Loaded the network configuration located at ${ccpPath}`);
+	logger.info(`Loaded the network configuration located at ${ccpPath}`);
 	return ccp;
 };
 
@@ -50,7 +50,7 @@ exports.buildCCPOrg3 = () => {
 	const contents = fs.readFileSync(ccpPath, 'utf8');
 	// build a JSON object from the file contents
 	const ccp = JSON.parse(contents);
-	// console.log(`Loaded the network configuration located at ${ccpPath}`);
+	logger.info(`Loaded the network configuration located at ${ccpPath}`);
 	return ccp;
 };
 
@@ -59,10 +59,9 @@ exports.buildWallet = async (Wallets, walletPath) => {
 	let wallet;
 	if (walletPath) {
 		wallet = await Wallets.newFileSystemWallet(walletPath);
-		// console.log(`Built a file system wallet at ${walletPath}`);
+		logger.info(`Built a file system wallet at ${walletPath}`);
 	} else {
 		wallet = await Wallets.newInMemoryWallet();
-		// console.log('Built an in memory wallet');
 	}
 	return wallet;
 };

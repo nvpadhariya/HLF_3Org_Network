@@ -20,9 +20,10 @@ const { channelName, chaincodeName,
 	mspOrg2,
 	mspOrg3,
 } = require('./config');
+const { logger } = require('./logger');
 
 async function initContractFromOrg1Identity() {
-	// console.log('\n--> Fabric client user & Gateway init: Using Org1 identity to Org1 Peer');
+	logger.info('\n--> Fabric client user & Gateway init: Using Org1 identity to Org1 Peer');
 	const ccpOrg1 = buildCCPOrg1();
 
 	const caOrg1Client = buildCAClient(FabricCAServices, ccpOrg1, 'ca.org1');
@@ -38,12 +39,12 @@ async function initContractFromOrg1Identity() {
 
 		return gatewayOrg1;
 	} catch (error) {
-		console.error(`Error in connecting to gateway: ${error}`);
+		logger.error(`Error in connecting to gateway: ${error}`);
 	}
 }
 
 async function initContractFromOrg2Identity() {
-	// console.log('\n--> Fabric client user & Gateway init: Using Org2 identity to Org2 Peer');
+	logger.info('\n--> Fabric client user & Gateway init: Using Org2 identity to Org2 Peer');
 	const ccpOrg2 = buildCcpOrg2();
 	const caOrg2Client = buildCAClient(FabricCAServices, ccpOrg2, 'ca.org2');
 
@@ -51,7 +52,6 @@ async function initContractFromOrg2Identity() {
 	const walletOrg2 = await buildWallet(Wallets, walletPathOrg2);
 
 	await enrollAdmin(caOrg2Client, walletOrg2, mspOrg2);
-	// await registerAndEnrollUser(caOrg2Client, walletOrg2, mspOrg2, Org2UserId, 'org2.department1');
 
 	try {
 		// Create a new gateway for connecting to Org's peer node.
@@ -61,19 +61,18 @@ async function initContractFromOrg2Identity() {
 
 		return gatewayOrg2;
 	} catch (error) {
-		console.error(`Error in connecting to gateway: ${error}`);
+		logger.error(`Error in connecting to gateway: ${error}`);
 	}
 }
 
 async function initContractFromOrg3Identity() {
-	// console.log('\n--> Fabric client user & Gateway init: Using Org3 identity to Org3 Peer');
+	logger.info('\n--> Fabric client user & Gateway init: Using Org3 identity to Org3 Peer');
 	const ccpOrg3 = buildCCPOrg3();
 	const caOrg3Client = buildCAClient(FabricCAServices, ccpOrg3, 'ca.org3');
 	const walletPathOrg3 = path.join(__dirname, 'wallet/org3');
 	const walletOrg3 = await buildWallet(Wallets, walletPathOrg3);
 
 	await enrollAdmin(caOrg3Client, walletOrg3, mspOrg3);
-	// await registerAndEnrollUser(caOrg3Client, walletOrg3, mspOrg3, Org3UserId, 'org3.department1');
 
 	try {
 		// Create a new gateway for connecting to Org's peer node.
@@ -83,7 +82,7 @@ async function initContractFromOrg3Identity() {
 
 		return gatewayOrg3;
 	} catch (error) {
-		console.error(`Error in connecting to gateway: ${error}`);
+		logger.error(`Error in connecting to gateway: ${error}`);
 	}
 }
 
@@ -94,7 +93,7 @@ async function main() {
 		const networkOrg1 = await gatewayOrg1.getNetwork(channelName);
 		const contractOrg1 = networkOrg1.getContract(chaincodeName);
 		contractOrg1.addDiscoveryInterest({ name: chaincodeName, collectionNames: [memberAssetCollectionName, org1PrivateCollectionName] });
-		// console.log(networkOrg1, contractOrg1, "contractOrg1");
+
 		/** ~~~~~~~ Fabric client init: Using Org2 identity to Org2 Peer ~~~~~~~ */
 		const gatewayOrg2 = await initContractFromOrg2Identity();
 		const networkOrg2 = await gatewayOrg2.getNetwork(channelName);
@@ -108,9 +107,9 @@ async function main() {
 		contractOrg3.addDiscoveryInterest({ name: chaincodeName, collectionNames: [memberAssetCollectionName, org3PrivateCollectionName] });
 	}
 	catch (error) {
-		console.error(`Error in transaction: ${error}`);
+		logger.error(`Error in transaction: ${error}`);
 		if (error.stack) {
-			console.error(error.stack);
+			logger.error(error.stack);
 		}
 	}
 }
