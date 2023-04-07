@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { logger } = require('./logger');
+const { logger } = require('./middleware/logger');
 
 exports.buildCCPOrg1 = () => {
 	// load the common connection configuration file

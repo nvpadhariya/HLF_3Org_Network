@@ -1,13 +1,13 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const { StatusCodes } = require('http-status-codes');
-const { mspOrg1, ccpOrg1, walletPathOrg1 } = require('../config')
+const { mspOrg1, ccpOrg1, walletPathOrg1 } = require('../config/config')
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg1, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
-const { validatePatient, validateAppointment } = require('../validation');
-const { logger } = require('../logger');
+const { validatePatient, validateAppointment } = require('../middleware/validation');
+const { logger } = require('../middleware/logger');
 
 const addPatientDetails = async (req, res) => {
     try {
@@ -52,7 +52,8 @@ const getPatientDetails = async (req, res) => {
         if (getPatientWallet) {
             let args = [req.params.patientId];
             let result = await Query("getPatientlByIdNew", args, req.params.patientId, ccpOrg1, walletPathOrg1);
-            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` });
+            let parseResult = JSON.parse(result);
+            res.status(StatusCodes.OK).send({ message: parseResult });
             logger.info(`Successfully fetched patient ${req.params.patientId} deatils`)
         }
         else {

@@ -1,14 +1,13 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const { StatusCodes } = require('http-status-codes');
-const { mspOrg2, ccpOrg2, walletPathOrg2 } = require('../config');
+const { mspOrg2, ccpOrg2, walletPathOrg2 } = require('../config/config');
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCcpOrg2, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
-const { validateHospital, validateUpdateAppointment } = require('../validation');
-const { logger } = require('../logger');
-const { Logform } = require('winston');
+const { validateHospital, validateUpdateAppointment } = require('../middleware/validation');
+const { logger } = require('../middleware/logger');
 
 const addHospitalDetails = async (req, res) => {
     try {
@@ -54,7 +53,8 @@ const getHospitalDetails = async (req, res) => {
         if (getHospitalWallet) {
             let args = [req.params.hospitalId];
             let result = await Query("getHospitalDetailsById", args, req.params.hospitalId, ccpOrg2, walletPathOrg2);
-            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` });
+            let parseResult = JSON.parse(result);
+            res.status(StatusCodes.OK).send({ message: parseResult });
             logger.info(`Successfully fetched hospital ${req.params.hospitalId} details`)
         }
         else {
@@ -94,7 +94,7 @@ const updateAppointment = async (req, res) => {
             }
         }
         else {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalId} does not exists` });
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalID} does not exists` });
             logger.error(`Hospital ${appointmentData.details.hospitalID} is not available`);
         }
 

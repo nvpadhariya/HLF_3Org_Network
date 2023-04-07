@@ -11,15 +11,15 @@ const mspOrg1 = 'PatientOrgMSP';
 const mspOrg2 = 'HospitalOrgMSP';
 const mspOrg3 = 'PharmacyOrgMSP';
 
-const ccpPathOrg1 = path.resolve(__dirname, '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'patientorg', 'connection-org1.json');
+const ccpPathOrg1 = path.resolve(__dirname, '..', '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'patientorg', 'connection-org1.json');
 const ccpOrg1 = JSON.parse(fs.readFileSync(ccpPathOrg1, 'utf8'));
 const walletPathOrg1 = path.join(process.cwd(), 'wallet/org1');
 
-const ccpPathOrg2 = path.resolve(__dirname, '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'hospitalorg', 'connection-org2.json');
+const ccpPathOrg2 = path.resolve(__dirname, '..', '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'hospitalorg', 'connection-org2.json');
 const ccpOrg2 = JSON.parse(fs.readFileSync(ccpPathOrg2, 'utf8'));
 const walletPathOrg2 = path.join(process.cwd(), 'wallet/org2');
 
-const ccpPathOrg3 = path.resolve(__dirname, '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'pharmacyorg', 'connection-org3.json');
+const ccpPathOrg3 = path.resolve(__dirname, '..', '..', '..', 'test-network-3org-new', 'organizations', 'peerOrganizations', 'pharmacyorg', 'connection-org3.json');
 const ccpOrg3 = JSON.parse(fs.readFileSync(ccpPathOrg3, 'utf8'));
 const walletPathOrg3 = path.join(process.cwd(), 'wallet/org3');
 

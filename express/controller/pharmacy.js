@@ -1,13 +1,13 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const { StatusCodes } = require('http-status-codes');
-const { mspOrg3, ccpOrg3, walletPathOrg3 } = require('../config')
+const { mspOrg3, ccpOrg3, walletPathOrg3 } = require('../config/config')
 const { buildCAClient, registerAndEnrollUser } = require('../CAUtil.js');
 const { buildCCPOrg3, buildWallet } = require('../AppUtil.js');
 const { Invoke } = require('../invoke');
 const { Query } = require('../query');
-const { validatePharmacy } = require('../validation');
-const { logger } = require('../logger');
+const { validatePharmacy } = require('../middleware/validation');
+const { logger } = require('../middleware/logger');
 
 const addPharmacyDetails = async (req, res) => {
     try {
@@ -52,7 +52,8 @@ const getPharmacyDetails = async (req, res) => {
         if (getPharmacyWallet) {
             let args = [req.params.pharmacyId];
             let result = await Query("getPharmacyDetailsById", args, req.params.pharmacyId, ccpOrg3, walletPathOrg3);
-            res.status(StatusCodes.OK).send({ message: `${JSON.parse(result)}` });
+            let parseResult = JSON.parse(result);
+            res.status(StatusCodes.OK).send({ message: parseResult });
             logger.info(`Successfully fetched pharmacy ${req.params.pharmacyId} details`);
         }
         else {

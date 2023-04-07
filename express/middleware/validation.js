@@ -3,7 +3,7 @@ const { OrgType,
     hospitalType,
     docType,
     patientType,
-    phoneRegExp } = require('./config');
+    phoneRegExp } = require('../config/config');
 
 const validatePatientSchema = yup
     .object({

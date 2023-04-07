@@ -8,7 +8,7 @@
 
 const adminUserId = 'admin';
 const adminUserPasswd = 'adminpw';
-const { logger } = require('./logger');
+const { logger } = require('./middleware/logger');
 
 /**
  *

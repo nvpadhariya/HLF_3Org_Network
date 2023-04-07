@@ -1,7 +1,7 @@
 const { Gateway, Wallets } = require('fabric-network');
 
-const { ccpOrg1, ccpOrg2, ccpOrg3, walletPathOrg1, walletPathOrg2, walletPathOrg3, channelName, chaincodeName } = require('./config');
-const { logger } = require('./logger');
+const { ccpOrg1, ccpOrg2, ccpOrg3, walletPathOrg1, walletPathOrg2, walletPathOrg3, channelName, chaincodeName } = require('./config/config');
+const { logger } = require('./middleware/logger');
 
 const Invoke = async (funcName, args, walletId, ccpOrg, walletPath) => {
     try {

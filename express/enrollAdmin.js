@@ -19,8 +19,8 @@ const { channelName, chaincodeName,
 	mspOrg1,
 	mspOrg2,
 	mspOrg3,
-} = require('./config');
-const { logger } = require('./logger');
+} = require('./config/config');
+const { logger } = require('./middleware/logger');
 
 async function initContractFromOrg1Identity() {
 	logger.info('\n--> Fabric client user & Gateway init: Using Org1 identity to Org1 Peer');

@@ -29,7 +29,7 @@
 		"Org1MSP": {
 			"mspid": "PatientOrgMSP",
 			"adminPrivateKey": {
-				"path": "/tmp/crypto/peerOrganizations/patientorg/users/Admin@patientorg/msp/keystore/8b18b9aa89917f82c3b84b9876ffc3ceada79cce9978c03998c02bc789ed6f46_sk"
+				"path": "/tmp/crypto/peerOrganizations/patientorg/users/Admin@patientorg/msp/keystore/fe27fd80dacf927b80f0a7dc35f4ffbe078cbd7313413a02cf7e7b262122a21d_sk"
 			},
 			"peers": ["peer0.patientorg"],
 			"signedCert": {
