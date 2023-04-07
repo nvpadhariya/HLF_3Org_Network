@@ -31,9 +31,7 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 app.use('/healthnetwork', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use("/", require("./router/patient"));
-app.use("/", require("./router/hospital"));
-app.use("/", require("./router/pharmacy"));
+app.use("/", require("./router/patient"), require("./router/hospital"), require("./router/pharmacy"));
 
 app.listen(3000, () => {
     logger.info(`Server started on port 3000`);

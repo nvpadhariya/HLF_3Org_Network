@@ -78,24 +78,24 @@ const updateAppointment = async (req, res) => {
         let args = [stringifyData];
 
         const wallet = await Wallets.newFileSystemWallet(walletPathOrg2);
-        let getHospitalWallet = await wallet.get(appointmentData.details.hospitalID);
+        let getHospitalWallet = await wallet.get(appointmentData.details.hospitalId);
         if (getHospitalWallet) {
-            let result = await Invoke("updateAppointment", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
+            let result = await Invoke("updateAppointment", args, appointmentData.details.hospitalId, ccpOrg2, walletPathOrg2);
             if (!result) {
                 res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ result: result.responses[0].response });
                 logger.error(`Appointment ${appointmentData.appointmentId} is not available`);
             }
             else {
                 let args = [appointmentData.appointmentId];
-                let getAppointment = await Query("getAppointmentDetailsById", args, appointmentData.details.hospitalID, ccpOrg2, walletPathOrg2);
+                let getAppointment = await Query("getAppointmentDetailsById", args, appointmentData.details.hospitalId, ccpOrg2, walletPathOrg2);
                 getAppointment = JSON.parse(getAppointment);
                 res.status(StatusCodes.OK).send({ Apponintment: getAppointment });
                 logger.info(`Successfully updated ${appointmentData.appointmentId} Appointment`);
             }
         }
         else {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalID} does not exists` });
-            logger.error(`Hospital ${appointmentData.details.hospitalID} is not available`);
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: `Hospital ${appointmentData.details.hospitalId} does not exists` });
+            logger.error(`Hospital ${appointmentData.details.hospitalId} is not available`);
         }
 
     }

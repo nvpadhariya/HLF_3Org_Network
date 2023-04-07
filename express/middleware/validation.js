@@ -5,9 +5,11 @@ const { OrgType,
     patientType,
     phoneRegExp } = require('../config/config');
 
+const { validHospital, validPatient, validPharmacy, validDoctor, validPhonenumber } = require('./message');
+
 const validatePatientSchema = yup
     .object({
-        patientId: yup.string().required().matches(/^P-\d+$/, 'Enter valid Patient ID.'),
+        patientId: yup.string().required().matches(/^P-\d+$/, `${validPatient}`),
         firstName: yup.string().required().trim().min(2).max(50),
         lastName: yup.string().required().trim().min(2).max(50),
         email: yup.string().required().required().email(),
@@ -20,7 +22,7 @@ const validatePatientSchema = yup
 
 const validateHospitalSchema = yup
     .object({
-        hospitalId: yup.string().required().matches(/^H-\d+$/, 'Enter valid Hospital ID.'),
+        hospitalId: yup.string().required().matches(/^H-\d+$/, `${validHospital}`),
         email: yup.string().required().email(),
         name: yup.string().required().trim().min(2).max(50),
         userType: yup.string().required().oneOf([OrgType.Patient, OrgType.Hospital, OrgType.Pharmacy]),
@@ -28,8 +30,8 @@ const validateHospitalSchema = yup
         doctor: yup.array()
             .of(
                 yup.object().shape({
-                    docID: yup.string().required(),
-                    Name: yup.string().required().min(2).max(50).required(),
+                    docId: yup.string().required().matches(/^D-\d+$/, `${validDoctor}`),
+                    name: yup.string().required().min(2).max(50).required(),
                     type: yup.string().required().oneOf([docType.dentist, docType.cardiologist]),
                 })
             )
@@ -38,11 +40,11 @@ const validateHospitalSchema = yup
 
 const validatePharmacySchema = yup
     .object({
-        pharmacyId: yup.string().required().required().matches(/^PH-\d+$/, 'Enter valid Hospital ID.'),
+        pharmacyId: yup.string().required().required().matches(/^PH-\d+$/, `${validPharmacy}`),
         email: yup.string().required().email(),
         name: yup.string().required().trim().min(2).max(50),
         userType: yup.string().required().oneOf([OrgType.Patient, OrgType.Hospital, OrgType.Pharmacy]),
-        mobileNumber: yup.string().required().matches(phoneRegExp, 'Phone number is not valid'),
+        mobileNumber: yup.string().required().matches(phoneRegExp, `${validPhonenumber}`),
         city: yup.string().required(),
         state: yup.string().required().min(2)
     })
@@ -50,21 +52,21 @@ const validatePharmacySchema = yup
 
 const validateAppointmentSchema = yup
     .object({
-        patientId: yup.string().required().matches(/^P-\d+$/, 'Enter valid Patient ID.'),
+        patientId: yup.string().required().matches(/^P-\d+$/, `${validPatient}`),
     })
     .required();
 
 const validateUpdateAppointmentSchema = yup.object().shape({
     appointmentId: yup.string().required(),
     details: yup.object().shape({
-        docID: yup.string().required().matches(/^D-\d+$/, 'Enter valid Doctor ID.'),
-        hospitalID: yup.string().required().matches(/^H-\d+$/, 'Enter valid Hospital ID.'),
-        slottime: yup.string().required(),
+        docId: yup.string().required().matches(/^D-\d+$/, `${validDoctor}`),
+        hospitalId: yup.string().required().matches(/^H-\d+$/, `${validHospital}`),
+        slotTime: yup.string().required(),
         slotDate: yup.string().required(),
-        Symptoms: yup.string().required()
+        symptoms: yup.string().required()
     }),
     prescription: yup.object().shape({
-        Tablet1: yup.string().required(),
+        tablet1: yup.string().required(),
         syrup: yup.string().required()
     }),
     status: yup.string().required()
