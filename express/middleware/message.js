@@ -1,7 +1,7 @@
-const validHospital = 'Enter valid Hospital ID.'
-const validPatient = 'Enter valid Patient ID.'
-const validPharmacy = 'Enter valid Pharmacy ID.'
-const validDoctor = 'Enter valid Doctor ID.'
-const validPhonenumber = 'Enter valid Phone number.'
-
-module.exports = { validHospital, validPatient, validPharmacy, validDoctor, validPhonenumber };
+module.exports.messageError = {
+    validHospital: 'Enter valid Hospital ID.',
+    validPatient: 'Enter valid Patient ID.',
+    validPharmacy: 'Enter valid Pharmacy ID.',
+    validDoctor: 'Enter valid Doctor ID.',
+    validPhonenumber: 'Enter valid Phone number.'
+};
